@@ -8,9 +8,9 @@ let memory = [];
        An der vierten Stelle hinterlegen wir "versteckt" wo wir unseren korrektes Bild später hinterlegen werden.
        0 wäre links, 1 wäre rechts.
 
-       memory[sound, image_01, image_02, winner]
-       stelle   1        2         3        4
-       index    0        1         2        3
+       memory[i] = [sound, image_01, image_02, winner];
+             stelle   1        2         3        4
+             index    0        1         2        3
 
     */
 
@@ -28,10 +28,11 @@ function preload() {
   memory[2] = [loadSound('assets/c'), loadImage('assets/c_01.png'), loadImage('assets/c_02.png'),0];
 }
 
-
 function setup() {
   createCanvas(windowWidth, windowHeight);
   textSize(30);
+  left = false;
+  right = false;
 }
 
 function draw() {
@@ -78,6 +79,7 @@ function mousePressed(){
     // 01. Wähle zufällig aus unserer Array Länge ( in diesem fall 3 Einträge) einen index aus (0 , 1 oder 2)
     index = int(random(memory.length));  
 
+
     /* 
        Grundsätzlich ist es so, dass an der 2. Stelle jedes 
        Memory-Array eintrags das korrekte Bild sitzt und an der 3. das falsche. 
@@ -88,7 +90,7 @@ function mousePressed(){
     // hier wuerfeln wir eine Zahl (0 oder 1) und hinterlegen die in unserem "winner" feld im Array an der vierten Stelle.
     memory[index][3] = wuerfeln(); //shuffle chosen Pairing
  
-    // wenn das winner feld = 0 ist, bedeutet das, dass wir links das match links platziert wird. ansonsten wird es rechts platzuert
+    // wenn das winner feld = 0 ist, bedeutet das, dass wir links das match platzieren. ansonsten wird es rechts platziert.
     if (memory[index][3] == 0) {
       left = memory[index][1]; 
       right = memory[index][2]; 
