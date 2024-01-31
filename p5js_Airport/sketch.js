@@ -3,10 +3,12 @@ let sounds = [];       // Hier werden alle Soundsets gespeichert.
 let soundset = [];     // Aktuelles Soundset, das verwendet wird.
 let images = [];       // Hier werden alle Bildersets gespeichert.
 
+let kt, rl, schs;
+
 let wp_index;          // Globaler Index zur Auswahl eines bestimmten Lautpaares.
 let memory_index;      // Globaler Index für das aktuelle Element im Soundset.
 
-let txt = "zum starten klicken"; // Starttext, der angezeigt wird.
+let txt; // Starttext, der angezeigt wird.
 let start = true;      // Flag, um den Start des Spiels zu steuern.
 let showImage = false; // Flag, um zu steuern, ob Bilder angezeigt werden sollen.
 let imgLeft;           // Bild für die linke Seite.
@@ -25,18 +27,46 @@ function preload() {
   // dann gibt es nochmal explizit eine memory_index variable, die zufällig ein soundset innerhalb des Lautpaares raussucht.
  
  sounds[0] = [
-    [loadSound('assets/Kopf.mp3'),1],  
+    [loadSound('assets/Kopf.mp3'),1], 
+    [loadSound('assets/Kiste.mp3'),1], 
     [loadSound('assets/Topf.wav'),0],
     [loadSound('assets/Tiger.wav'),0],
-    [loadSound('assets/Tanne.wav'),0],
-    [loadSound('assets/Kiste.mp3'),1]
+    [loadSound('assets/Tanne.wav'),0]
   ];
+  sounds[1] = [
+    [loadSound('assets/Regen2.wav'),1],  
+    [loadSound('assets/Regenbogen.wav'),1],
+    [loadSound('assets/Reifen.wav'),1],
+    [loadSound('assets/Rucksack.wav'),1],
+    [loadSound('assets/Laterne.wav'),0],
+    [loadSound('assets/Limonade.wav'),0],  
+    [loadSound('assets/Lolli.wav'),0],
+    [loadSound('assets/Luftballon.wav'),0]
+  ];
+
+  sounds[2] = [
+    [loadSound('assets/Sand.wav'),1],
+    [loadSound('assets/Seil.wav'),1],
+    [loadSound('assets/Sofa.wav'),1],
+    [loadSound('assets/Sonne.wav'),1],
+    [loadSound('assets/Schal.wav'),0],  
+    [loadSound('assets/Schirm.wav'),0],
+    [loadSound('assets/Schokolade.wav'),0],
+    [loadSound('assets/Schrank.wav'),0]
+  ]
   images[0] = [loadImage('assets/Lautsymbol1.png'),loadImage('assets/Lautsymbol2.png')]
+  images[1] = [loadImage('assets/alarmclock.png'),loadImage('assets/Lion.png')]
+  images[2] = [loadImage('assets/Snake.png'),loadImage('assets/Zug.png')]
+  
   imgEar = loadImage('assets/Ohr.png');
 
   soundCorrect = loadSound('assets/WinSound.mp3');
   soundWrong = loadSound('assets/WrongAnswer.mp3');
 
+  //lautpaare für den Startscreen
+  kt = loadImage('assets/kt.png');
+  rl = loadImage('assets/rl.png');
+  schs = loadImage('assets/schs.png');
 
 }
 
@@ -54,7 +84,7 @@ function setup() {
 }
 
 function draw() {
- background(20, 0, 100);
+ background(200, 200, 220);
 
  // wenn txt nicht false ist soll er gezeigt werden.
  if(txt){
@@ -66,6 +96,44 @@ function draw() {
    image(imgEar, width/2 - imgEar.width/8, 0, imgEar.width/4, imgEar.height/4)
    image(imgLeft, 0, height/2, width/2, height/2, 0, 0, imgLeft.width, imgLeft.height, CONTAIN);
    image(imgRight, width/2, height/2, width/2, height/2, 0, 0, imgRight.width, imgRight.height, CONTAIN);
+ }
+
+ if(start == true) {
+  //let yOffset = height * 0.01;
+  // hier definieren wir unseren startscreen, der aus einem grid dreier paare besteht.
+  
+
+  // funky bewegung der bilder und schatten in abhängigkeit mit dem frameCount
+  // eine zahl die die draw loops hochzäht, sobald das programm startet.... 
+  // geht also immer weiter hoch, je länger das programm läuft
+  // das ist unser t... wenn wir daraus den sin() nehmen bekommen wir eine oscillation
+  // siehe einheitskreis ... schwiungung
+  let t = frameCount;
+  let t2 = frameCount+50;
+  let t3 = frameCount+100;
+
+  let x = 6 * sin(t * 0.026);
+  let x2 = 6 * sin(t2 * 0.02);
+  let x3 = 6 * sin(t3 * 0.023);
+  
+  noStroke();
+  fill(0,100);
+
+  let sOffset = 15; // shadowoffset
+  //shadow
+  rect(width/2 - kt.width/10+x2+sOffset, height*0.1+sOffset, kt.width/5, kt.height/5);
+  // image
+  image(kt, width/2 - kt.width/10+x, height*0.1, kt.width/5, kt.height/5);
+
+
+  //shadow
+  rect(width/2 - rl.width/10+x3+sOffset, height*0.4+sOffset, rl.width/5, rl.height/5);
+  image(rl, width/2 - rl.width/10+x2, height*0.4, rl.width/5, rl.height/5);
+  
+ 
+  //shadow
+  rect(width/2 - schs.width/10+x2+sOffset, height*0.7+sOffset, schs.width/5, schs.height/5); 
+  image(schs, width/2 - schs.width/10+x3, height*0.7, schs.width/5, schs.height/5);
  }
 
 }
@@ -85,6 +153,23 @@ function mousePressed() {
   // Wenn das Spiel gerade gestartet wurde (start == true),
   // dann wird dieser Block ausgeführt.
   if (start) {
+
+    // schritt 1: wir checken welches der drei höhenareale geklickt wurde und definieren damit unser Lautpaar:
+    // ist mouseY im ersten drittel (also kleienr als 0.33*height) dann ist das level 0;
+    // umgekehrt ist mouseY beim klicken größer als 66% der Screenhöhe dann ist das Level 2;
+    // bei allen anderen sind wir in der Mitte, also Level 1 im Array.
+
+    if (mouseY <= height*0.33) {
+      wp_index = 0; 
+    } else if (mouseY >= height * 0.66){
+      wp_index = 2;
+    } else {
+      wp_index = 1;
+
+    }
+
+
+
     txt = false; // Entfernt den Starttext.
     showImage = true; // Aktiviert die Anzeige der Bilder.
 
@@ -100,7 +185,8 @@ function mousePressed() {
     console.log(soundset[memory_index][1]);
 
     start = false; // Setzt das Start-Flag auf false, da das Spiel nun läuft.
-  } else {
+  } else  {
+    console.log("hi");
     // Wenn das Spiel läuft und der Nutzer auf den unteren Bereich des Bildschirms klickt.
     if (mouseY > height / 2) {
       // Überprüft, ob der Klick auf der korrekten Seite erfolgte.
@@ -118,7 +204,7 @@ function mousePressed() {
         } else {
           // Wenn nicht, beendet es das Spiel und zeigt das Ende-Textfeld an.
           showImage = false;
-          txt = "fertig";
+          start = true;
         }
       } else {
         // Wenn die Auswahl falsch war, gibt es eine Meldung aus.
