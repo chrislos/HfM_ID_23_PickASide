@@ -34,14 +34,14 @@ function preload() {
     [loadSound('assets/Tanne.wav'),0]
   ];
   sounds[1] = [
-    [loadSound('assets/Regen2.wav'),1],  
-    [loadSound('assets/Regenbogen.wav'),1],
-    [loadSound('assets/Reifen.wav'),1],
-    [loadSound('assets/Rucksack.wav'),1],
-    [loadSound('assets/Laterne.wav'),0],
-    [loadSound('assets/Limonade.wav'),0],  
-    [loadSound('assets/Lolli.wav'),0],
-    [loadSound('assets/Luftballon.wav'),0]
+    [loadSound('assets/Regen2.wav'),0],  
+    [loadSound('assets/Regenbogen.wav'),0],
+    [loadSound('assets/Reifen.wav'),0],
+    [loadSound('assets/Rucksack.wav'),0],
+    [loadSound('assets/Laterne.wav'),1],
+    [loadSound('assets/Limonade.wav'),1],  
+    [loadSound('assets/Lolli.wav'),1],
+    [loadSound('assets/Luftballon.wav'),1]
   ];
 
   sounds[2] = [
@@ -75,10 +75,10 @@ function setup() {
  textSize(30);
 
  // welches Level wählen wir an? Aktuell gibt es nur level 0 (K & T)
- wp_index = 0;
+//  wp_index = 0;
 
-  // die zweite array stelle innerhalb eines soundsets 0 oder 1 gibt an, ob das korrekte Lautsymbol links oder rechts sitzt 
- soundset = sounds[wp_index];
+//   // die zweite array stelle innerhalb eines soundsets 0 oder 1 gibt an, ob das korrekte Lautsymbol links oder rechts sitzt 
+//  soundset = sounds[wp_index];
  
 
 }
@@ -125,12 +125,10 @@ function draw() {
   // image
   image(kt, width/2 - kt.width/10+x, height*0.1, kt.width/5, kt.height/5);
 
-
   //shadow
   rect(width/2 - rl.width/10+x3+sOffset, height*0.4+sOffset, rl.width/5, rl.height/5);
   image(rl, width/2 - rl.width/10+x2, height*0.4, rl.width/5, rl.height/5);
   
- 
   //shadow
   rect(width/2 - schs.width/10+x2+sOffset, height*0.7+sOffset, schs.width/5, schs.height/5); 
   image(schs, width/2 - schs.width/10+x3, height*0.7, schs.width/5, schs.height/5);
@@ -143,16 +141,39 @@ function windowResized() {
 }
 
 
+// smartphone-click
+function touchStarted() {
+  // Handle touch event
+  klick();
+  return false; // This prevents default behavior for touch events
+}
+
+
+// pc-click
 function mousePressed() {
-  // Stoppt alle Sounds im aktuellen Soundset.
+  // Handle mouse click event
+  klick();
+  return false; // This prevents default behavior for mouse events
+}
+
+function klick() {
+// Stoppt alle Sounds im aktuellen Soundset.
   // Dies verhindert, dass mehrere Sounds gleichzeitig abgespielt werden.
   for (let i = 0; i < soundset.length; i++) {
     soundset[i][0].stop();
   }
 
+  console.log("mousePressed called, start is", start);
   // Wenn das Spiel gerade gestartet wurde (start == true),
   // dann wird dieser Block ausgeführt.
+
+
+
+
   if (start) {
+    showImage = false;
+    console.log("here start should be initally true. so first click should be here", start);
+  
 
     // schritt 1: wir checken welches der drei höhenareale geklickt wurde und definieren damit unser Lautpaar:
     // ist mouseY im ersten drittel (also kleienr als 0.33*height) dann ist das level 0;
@@ -165,28 +186,33 @@ function mousePressed() {
       wp_index = 2;
     } else {
       wp_index = 1;
-
     }
 
+    console.log("sounds_should always have the same length ", sounds[0].length);
 
-
+    // ich muss das Array auf soundset kopieren und nicht einfach zuweisen daher die ... (suche nach spread operator)
+    soundset = [...sounds[wp_index]];
+    console.log("sset_start: ", soundset.length);  
+    
     txt = false; // Entfernt den Starttext.
     showImage = true; // Aktiviert die Anzeige der Bilder.
 
     // Wählt ein zufälliges Element aus dem Soundset aus und spielt es ab.
     memory_index = int(random(soundset.length));
+    if (soundset.length > 0){
     soundset[memory_index][0].play();
+    }
 
     // Lädt die Bilder für die linke und rechte Seite.
     imgLeft = images[wp_index][0];
     imgRight = images[wp_index][1];
 
-    // Protokolliert, welche Seite das korrekte Lautpaar hat (links oder rechts).
-    console.log(soundset[memory_index][1]);
+  
 
     start = false; // Setzt das Start-Flag auf false, da das Spiel nun läuft.
-  } else  {
-    console.log("hi");
+  } else if (start == false){
+    console.log("here start should be false. This shouldn't be excecutet on first click", start);
+    console.log("sset_game: ", soundset.length);
     // Wenn das Spiel läuft und der Nutzer auf den unteren Bereich des Bildschirms klickt.
     if (mouseY > height / 2) {
       // Überprüft, ob der Klick auf der korrekten Seite erfolgte.
@@ -205,6 +231,7 @@ function mousePressed() {
           // Wenn nicht, beendet es das Spiel und zeigt das Ende-Textfeld an.
           showImage = false;
           start = true;
+          return
         }
       } else {
         // Wenn die Auswahl falsch war, gibt es eine Meldung aus.
@@ -219,5 +246,5 @@ function mousePressed() {
       }
     }
   }
-}
 
+}
