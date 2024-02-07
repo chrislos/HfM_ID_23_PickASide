@@ -3,8 +3,9 @@ let sounds = [];       // Hier werden alle Soundsets gespeichert.
 let soundset = [];     // Aktuelles Soundset, das verwendet wird.
 let images = [];       // Hier werden alle Bildersets gespeichert.
 
-let level_index;       // Globaler Index zur Auswahl eines bestimmten Lautpaares.
+let wp_index;          // Globaler Index zur Auswahl eines bestimmten Lautpaares.
 let memory_index;      // Globaler Index für das aktuelle Element im Soundset.
+
 let txt = "zum starten klicken"; // Starttext, der angezeigt wird.
 let start = true;      // Flag, um den Start des Spiels zu steuern.
 let showImage = false; // Flag, um zu steuern, ob Bilder angezeigt werden sollen.
@@ -20,7 +21,7 @@ function preload() {
   // das erste soundset (K/T) hinterlegen wir an der stelle 0 im array. 
   // das zweiten (B / P?) würde dann unter sounds[1] liegen.
   // analog wird dann hinter images[1] das entsprechene BP paar sitzen.
-  // angesteuert werden die indices beider Arrays (Sound + Image) durch die level_index variable
+  // angesteuert werden die indices beider Arrays (Sound + Image) durch die wp_index variable
   // dann gibt es nochmal explizit eine memory_index variable, die zufällig ein soundset innerhalb des Lautpaares raussucht.
  
  sounds[0] = [
@@ -44,10 +45,10 @@ function setup() {
  textSize(30);
 
  // welches Level wählen wir an? Aktuell gibt es nur level 0 (K & T)
- level_index = 0;
+ wp_index = 0;
 
-  // die zweite array stelle innerhalb eines soundsets 0 oder 1 gibt an, ob das lautpaar links oder rechts sitzt 
- soundset = sounds[level_index];
+  // die zweite array stelle innerhalb eines soundsets 0 oder 1 gibt an, ob das korrekte Lautsymbol links oder rechts sitzt 
+ soundset = sounds[wp_index];
  
 
 }
@@ -92,8 +93,8 @@ function mousePressed() {
     soundset[memory_index][0].play();
 
     // Lädt die Bilder für die linke und rechte Seite.
-    imgLeft = images[level_index][0];
-    imgRight = images[level_index][1];
+    imgLeft = images[wp_index][0];
+    imgRight = images[wp_index][1];
 
     // Protokolliert, welche Seite das korrekte Lautpaar hat (links oder rechts).
     console.log(soundset[memory_index][1]);
@@ -103,8 +104,8 @@ function mousePressed() {
     // Wenn das Spiel läuft und der Nutzer auf den unteren Bereich des Bildschirms klickt.
     if (mouseY > height / 2) {
       // Überprüft, ob der Klick auf der korrekten Seite erfolgte.
-      // Ist der Klick auf der linken Seite und das Lautpaar ist links (0) oder
-      // ist der Klick auf der rechten Seite und das Lautpaar ist rechts (1).
+      // Ist der Klick auf der linken Seite und das korrekte Lautsymbol ist links (0) oder
+      // ist der Klick auf der rechten Seite und das korrekte Lautsymbol ist rechts (1).
       if ((mouseX <= width / 2 && soundset[memory_index][1] == 0) || (mouseX > width / 2 && soundset[memory_index][1] == 1)) {
         console.log("Richtig!"); // Gibt eine Meldung aus, dass die Auswahl korrekt war.
         soundset.splice(memory_index, 1); // Entfernt das korrekte Element aus dem Soundset.
